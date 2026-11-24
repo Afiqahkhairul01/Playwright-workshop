@@ -1,4 +1,4 @@
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 
 
 class UsersPage:
@@ -22,6 +22,8 @@ class UsersPage:
 
     def reset_data(self):
         self.reset_button.click()
+        # Wait for the reloaded page, so the next step sees the 5 default users
+        expect(self.flash_message).to_have_text("Your data has been reset to the 5 default users.")
 
     def add_user(self):
         self.add_user_link.click()
