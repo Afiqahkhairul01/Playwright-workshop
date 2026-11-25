@@ -51,3 +51,35 @@ def test_get_unknown_user_returns_404(api):
 
     assert response.status == 404
     assert response.json()["error"] == "User 999 not found"
+
+def test_update_user(api):
+    changes = build_user(
+        name="Aisha R.",
+        email="aisha.rahman@example.com",
+        age=30,
+        address={"street": "12 Jalan Bukit", "city": "Kuala Lumpur", "postcode": "50450"},
+    )
+
+    response = api.put("/api/users/1", data=changes)
+
+    assert response.status == 200
+    updated = response.json()
+    assert updated["id"] == 1
+    assert updated["name"] == "Aisha R."
+    assert updated["age"] == 30
+    assert api.get("/api/users/1").json()["name"] == "Aisha R."
+
+
+def test_update_unknown_user_returns_404(api):
+    response = api.put("/api/users/999", data=build_user())
+
+    assert response.status == 404
+
+
+def test_delete_user(api):
+    response = api.delete("/api/users/3")
+
+    assert response.status == 204
+    assert response.text() == ""
+    assert api.get("/api/users/3").status == 404
+    assert api.get("/api/users").json()["count"] == 4
